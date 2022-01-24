@@ -1,6 +1,7 @@
 import { Link, useRouteMatch } from "react-router-dom";
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { useState } from "react";
 
 const Nav = styled.nav`
   display: flex;
@@ -25,6 +26,10 @@ const Logo = styled(motion.svg)`
   width: 95px;
   height: 25px;
   fill: ${(props) => props.theme.red};
+  path {
+    stroke-width: 6px;
+    stroke: white;
+  }
 `;
 
 const Items = styled.ul`
@@ -47,12 +52,15 @@ const Item = styled.li`
 
 const Search = styled.span`
   color: white;
+  display: flex;
+  align-items: center;
+  position: relative;
   svg {
     height: 25px;
   }
 `;
 
-const Circle = styled.span`
+const Circle = styled(motion.span)`
   position: absolute;
   width: 5px;
   height: 5px;
@@ -64,8 +72,14 @@ const Circle = styled.span`
   background-color: ${(props) => props.theme.red};
 `;
 
+const Input = styled(motion.input)`
+  transform-origin: right center;
+  position: absolute;
+  left: -150px;
+`;
+
 const logoVariants = {
-  normal:{
+  normal: {
     fillOpacity: 1,
   },
   active: {
@@ -78,15 +92,17 @@ const logoVariants = {
 };
 
 function Header() {
+  const [searchOpen, setSearchOpen] = useState(false);
   const homeMatch = useRouteMatch("/");
   const tvMatch = useRouteMatch("/tv");
+  const toggleSearch = () => setSearchOpen((prev) => !prev);
   return (
     <Nav>
       <Col>
         <Logo
           variants={logoVariants}
           whileHover="active"
-          initial="noraml"
+          initial="normal"
           xmlns="http://www.w3.org/2000/svg"
           width="1024"
           height="276.742"
@@ -96,26 +112,38 @@ function Header() {
         </Logo>
         <Items>
           <Item>
-            <Link to="/">Home {homeMatch?.isExact && <Circle />}</Link>
+            <Link to="/">
+              Home {homeMatch?.isExact && <Circle layoutId="circle" />}
+            </Link>
           </Item>
           <Item>
-            <Link to="/tv">Tv Shows {tvMatch && <Circle />}</Link>
+            <Link to="/tv">
+              Tv Shows {tvMatch && <Circle layoutId="circle" />}
+            </Link>
           </Item>
         </Items>
       </Col>
       <Col>
         <Search>
-          <svg
+          <motion.svg
+            onClick={toggleSearch}
+            animate={{ x: searchOpen ? -180 : 0 }}
+            transition={{ type: "linear" }}
             fill="currentColor"
             viewBox="0 0 20 20"
-            xmlns="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               fillRule="evenodd"
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
               clipRule="evenodd"
             ></path>
-          </svg>
+          </motion.svg>
+          <Input
+            transition={{ type: "linear" }}
+            animate={{ scaleX: searchOpen ? 1 : 0 }}
+            placeholder="Search for movie or tv show..."
+          />
         </Search>
       </Col>
     </Nav>
