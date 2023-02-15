@@ -19,6 +19,11 @@ import {
 } from '../api';
 import { CATEGORY_MOVIE, CATEGORY_TV } from '../constants';
 import { makeImagePath } from '../utils';
+import {AiOutlinePlus} from "react-icons/ai"
+import {BsFillPlayFill} from "react-icons/bs"
+import {FiThumbsUp, FiThumbsDown} from "react-icons/fi"
+
+
 
 const Loader = styled.div`
   width: 100%;
@@ -480,29 +485,17 @@ function ClickMovie({
                     </BigTitle>
                     <UserBox key={clickedData.id + 'az8'}>
                       <Playbox key={clickedData.id + 'az9'}>
-                        <i
-                          key={clickedData.id + 'a10'}
-                          className="fas fa-play"
-                        />
+                        <BsFillPlayFill key={clickedData.id + 'a10'} size="30" />
                         <span key={clickedData.id + 'az11'}> 재생</span>
                       </Playbox>
                       <PlayCircle key={clickedData.id + 'az12'}>
-                        <i
-                          key={clickedData.id + 'az13'}
-                          className="fas fa-plus"
-                        />
+                        <AiOutlinePlus key={clickedData.id + 'az13'}/>
                       </PlayCircle>
                       <PlayCircle key={clickedData.id + 'az14'}>
-                        <i
-                          key={clickedData.id + 'az15'}
-                          className="far fa-thumbs-up"
-                        />
+                        <FiThumbsUp key={clickedData.id + 'az15'} />
                       </PlayCircle>
                       <PlayCircle key={clickedData.id + 'az16'}>
-                        <i
-                          key={clickedData.id + 'az17'}
-                          className="far fa-thumbs-down"
-                        />
+                        <FiThumbsDown  key={clickedData.id + 'az17'}/>
                       </PlayCircle>
                     </UserBox>
                     <DetailGrid key={clickedData.id + 'az18'}>
