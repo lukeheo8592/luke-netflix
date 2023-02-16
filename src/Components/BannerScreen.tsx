@@ -35,7 +35,7 @@ const Wrapper = styled.div`
   justify-content: center;
   align-content: center;
   position: absolute;
-  padding: 60px 0px 0px 60px;
+  padding: 61px 0px 0px 60px;
   z-index: 0;
 `;
 
