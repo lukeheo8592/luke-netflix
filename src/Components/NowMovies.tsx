@@ -18,6 +18,8 @@ const Slider = styled.div`
   height: 180px;
   top: -170px;
   margin-bottom: 70px;
+  margin-top: 100px;
+  
 `;
 
 const Row = styled(motion.div)<{ isFirst: number; hover: boolean }>`

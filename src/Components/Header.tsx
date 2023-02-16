@@ -1,7 +1,15 @@
-import { Link, useRouteMatch } from "react-router-dom";
-import styled from "styled-components";
-import { motion, useAnimation, useViewportScroll } from "framer-motion";
-import { useEffect, useState } from "react";
+import {
+  motion,
+  useAnimation,
+  useViewportScroll,
+  Variants,
+} from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useHistory, useRouteMatch } from 'react-router';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import { KEYWORD } from '../constants';
 
 const Nav = styled(motion.nav)`
   display: flex;
@@ -28,6 +36,18 @@ const Logo = styled(motion.svg)`
   fill: ${(props) => props.theme.red};
 `;
 
+const Circle = styled(motion.span)`
+  width: 5px;
+  height: 5px;
+  border-radius: 2.5px;
+  background-color: ${(props) => props.theme.red};
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+`;
+
 const Items = styled.ul`
   display: flex;
   align-items: center;
@@ -46,33 +66,21 @@ const Item = styled.li`
   }
 `;
 
-const Search = styled.span`
+const Search = styled.form`
   color: white;
+  position: relative;
   display: flex;
   align-items: center;
-  position: relative;
   svg {
     height: 25px;
   }
 `;
 
-const Circle = styled(motion.span)`
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-radius: 5px;
-  bottom: -5px;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  background-color: ${(props) => props.theme.red};
-`;
-
 const Input = styled(motion.input)`
   transform-origin: right center;
   position: absolute;
-  right: -30px;
   padding: 5px 10px;
+  right: 0;
   padding-left: 40px;
   z-index: -1;
   color: white;
@@ -81,7 +89,7 @@ const Input = styled(motion.input)`
   border: 1px solid ${(props) => props.theme.white.lighter};
 `;
 
-const logoVariants = {
+const LogoVariants = {
   normal: {
     fillOpacity: 1,
   },
@@ -94,49 +102,43 @@ const logoVariants = {
   },
 };
 
-const navVariants = {
-  top: {
-    backgroundColor: "rgba(0, 0, 0, 0)",
-  },
-  scroll: {
-    backgroundColor: "rgba(0, 0, 0, 1)",
-  },
-};
-
+interface IForm {
+  keyword: string;
+}
 
 function Header() {
-  const [searchOpen, setSearchOpen] = useState(false);
-  const homeMatch = useRouteMatch("/");
-  const tvMatch = useRouteMatch("/tv");
-  const inputAnimation = useAnimation();
+  const { register, handleSubmit } = useForm<IForm>();
+  const history = useHistory();
+  const [openSearch, setOpenSearch] = useState(false);
+  const homeMatch = useRouteMatch('/');
+  const tvMatch = useRouteMatch('/tv');
   const navAnimation = useAnimation();
+  //   console.log(homeMatch, tvMatch);
   const { scrollY } = useViewportScroll();
   const toggleSearch = () => {
-    if (searchOpen) {
-      inputAnimation.start({
-        scaleX: 0,
-      });
-    } else {
-      inputAnimation.start({ scaleX: 1 });
-    }
-    setSearchOpen((prev) => !prev);
+    setOpenSearch((current) => !current);
   };
   useEffect(() => {
     scrollY.onChange(() => {
       if (scrollY.get() > 80) {
-        navAnimation.start("scroll");
+        navAnimation.start({ backgroundColor: 'rgba(0,0,0,1)' });
       } else {
-        navAnimation.start("top");
+        navAnimation.start({ backgroundColor: 'rgba(0,0,0,0)' });
       }
     });
   }, [scrollY, navAnimation]);
+  const onValid = (data: IForm) => {
+    //console.log(data);
+    history.push(`/search?keyword=${data.keyword}`);
+  };
   return (
-    <Nav variants={navVariants} animate={navAnimation} initial={"top"}>
+    <Nav initial={{ backgroundColor: 'rgba(0,0,0,0)' }} animate={navAnimation}>
       <Col>
         <Logo
-          variants={logoVariants}
-          whileHover="active"
+          variants={LogoVariants}
+          initial="normal"
           animate="normal"
+          whileHover="active"
           xmlns="http://www.w3.org/2000/svg"
           width="1024"
           height="276.742"
@@ -147,22 +149,22 @@ function Header() {
         <Items>
           <Item>
             <Link to="/">
-              Home {homeMatch?.isExact && <Circle layoutId="circle" />}
+              Home {homeMatch?.isExact === true && <Circle layoutId="circle" />}
             </Link>
           </Item>
           <Item>
             <Link to="/tv">
-              Tv Shows {tvMatch && <Circle layoutId="circle" />}
+              Tv Show {tvMatch && <Circle layoutId="circle" />}
             </Link>
           </Item>
         </Items>
       </Col>
       <Col>
-        <Search>
+        <Search onSubmit={handleSubmit(onValid)}>
           <motion.svg
             onClick={toggleSearch}
-            animate={{ x: searchOpen ? -185 : 0 }}
-            transition={{ type: "linear" }}
+            animate={{ x: openSearch ? -210 : 0 }}
+            transition={{ type: 'linear' }}
             fill="currentColor"
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -171,13 +173,13 @@ function Header() {
               fillRule="evenodd"
               d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
               clipRule="evenodd"
-            ></path>
+            />
           </motion.svg>
           <Input
-            animate={inputAnimation}
-            initial={{ scaleX: 0 }}
-            transition={{ type: "linear" }}
-            placeholder="Search for movie or tv show..."
+            {...register(KEYWORD, { required: true, minLength: 2 })}
+            placeholder="Search for movie or tv shows..."
+            animate={{ scaleX: openSearch ? 1 : 0 }}
+            transition={{ type: 'linear' }}
           />
         </Search>
       </Col>
